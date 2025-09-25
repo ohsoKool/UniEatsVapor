@@ -18,10 +18,3 @@ To execute tests, use the following command:
 ```bash
 swift test
 ```
-
-### See more
-
-- [Vapor Website](https://vapor.codes)
-- [Vapor Documentation](https://docs.vapor.codes)
-- [Vapor GitHub](https://github.com/vapor)
-- [Vapor Community](https://github.com/vapor-community)

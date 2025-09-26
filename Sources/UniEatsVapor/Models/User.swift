@@ -22,11 +22,15 @@ final class User: Model, Content, @unchecked Sendable {
     @Field(key: "mobile")
     var mobile: String
 
-    @Field(key: "dob")
+    @OptionalField(key: "dob")
     var dob: Date?
 
-    @Field(key: "gender")
+    @OptionalField(key: "gender")
     var gender: String?
+
+    // This tells Fluent: User has many Address rows
+    @Children(for: \.$user)
+    var addresses: [Address]
 
     // empty init for fluent
     init() {}

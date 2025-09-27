@@ -1,7 +1,6 @@
 import Vapor
 
 struct CreateAddressDTO: Content {
-//    let userId: UUID
     let street: String
     let city: String
     let state: String

@@ -15,6 +15,9 @@ struct CreateUser: AsyncMigration {
             .unique(on: "mobile")
             .field("gender", .string)
             .field("dob", .date)
+            .field("created_at", .datetime)
+            .field("updated_at", .datetime)
+            .field("deleted_at", .datetime)
             .create()
     }
 

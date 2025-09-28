@@ -22,6 +22,12 @@ public func configure(_ app: Application) async throws {
 
     app.migrations.add(CreateUser())
     app.migrations.add(CreateAddress())
+    app.migrations.add(CreateVendor())
+    app.migrations.add(CreateDocument())
+    app.migrations.add(CreateRestaurant())
+    app.migrations.add(CreateCoupon())
+    app.migrations.add(CreateMenuCategory())
+    app.migrations.add(CreateMenuItem())
 
     // **Run migrations automatically**
     try await app.autoMigrate()

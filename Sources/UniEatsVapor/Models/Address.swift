@@ -4,35 +4,32 @@ import Vapor
 final class Address: Model, Content, @unchecked Sendable {
     static let schema = "addresses"
 
-    @ID(key: .id)
-    var id: UUID?
+    @ID(key: .id) var id: UUID?
+    // This tells Fluent: addresses table has a column user_id which is a foreign key pointing to users.id in the User model
+    // Doing this creates a backing property called _$user (used in the init)
+    @Field(key: "street") var street: String
+    @Field(key: "city") var city: String
+    @Field(key: "state") var state: String
+    @Field(key: "postal_code") var postalCode: String
+    @Field(key: "is_default") var isDefault: Bool
 
-    // This tells Fluent: addresses table has a column userId which is a foreignkey pointing to users.id in the User mdoel
-    // Doing this creates a backing proprety called _$user (used in the init)
-    @Parent(key: "userId")
-    var user: User
+    @Parent(key: "user_id") var user: User
 
-    @Field(key: "street")
-    var street: String
+    // Tracks when this row was created
+    @Timestamp(key: "created_at", on: .create) var createdAt: Date?
+    // Tracks when this row was last updated
+    @Timestamp(key: "updated_at", on: .update) var updatedAt: Date?
+    // Tracks when this row was last deleted
+    @Timestamp(key: "deleted_at", on: .update) var deletedAt: Date?
 
-    @Field(key: "city")
-    var city: String
-
-    @Field(key: "state")
-    var state: String
-
-    @Field(key: "postalCode")
-    var postalCode: String
-
-    @Field(key: "isDefault")
-    var isDefault: Bool
-
+    // Empty init for Fluent
     init() {}
 
+    // Init for app use
     init(id: UUID? = nil, userId: UUID, street: String, city: String, state: String, postalCode: String, isDefault: Bool = false) {
         self.id = id
-        // linked to the id in the users table
-        self.$user.id = userId
+        // Linked to the id in the users table
+        $user.id = userId
         self.street = street
         self.city = city
         self.state = state

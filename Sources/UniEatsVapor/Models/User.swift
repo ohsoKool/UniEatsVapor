@@ -41,7 +41,7 @@ final class User: Model, Content, @unchecked Sendable {
     var updatedAt: Date?
 
     // Tracks when this row was last updated
-    @Timestamp(key: "deleted_at", on: .update)
+    @Timestamp(key: "deleted_at", on: .delete)
     var deletedAt: Date?
 
     // Empty init for Fluent

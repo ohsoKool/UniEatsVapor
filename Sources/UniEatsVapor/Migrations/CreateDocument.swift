@@ -20,7 +20,7 @@ struct CreateDocument: AsyncMigration {
             .field("expiry_date", .date, .required)
             .field("verified_on", .date)
             .field("note", .string)
-            .field("status", status, .required)
+            .field("status", status, .required, .sql(.default("pending")))
             .field("created_at", .datetime)
             .field("updated_at", .datetime)
             .field("deleted_at", .datetime)

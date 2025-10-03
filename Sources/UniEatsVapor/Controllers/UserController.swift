@@ -4,11 +4,13 @@ import Vapor
 struct UserController: RouteCollection {
     func boot(routes: any RoutesBuilder) throws {
         let users = routes.grouped("users")
+
         users.post(use: createUser)
         users.get(use: getAllUsers)
         users.get(":userId", use: getUser)
         users.put(":userId", use: updateUser)
         users.delete(":userId", use: deleteUser)
+        users.patch(":userId", ":vendorId", use: verifyVendor)
     }
 }
 
@@ -104,5 +106,35 @@ extension UserController {
         try await user.delete(on: req.db)
 
         return .noContent
+    }
+
+    func verifyVendor(req: Request) async throws -> String {
+        // 1. Get Both userId and vendorId from the request parameters
+        guard
+            // Both userId and vendorId must exist
+            let userId = req.parameters.get("userId", as: UUID.self),
+            let vendorId = req.parameters.get("vendorId", as: UUID.self)
+        else {
+            throw Abort(.badRequest, reason: "userId and vendorId are required!")
+        }
+
+        // 2. Check whether the user is present or not
+        guard let user = try await User.find(userId, on: req.db) else {
+            throw Abort(.notFound, reason: "User not found!")
+        }
+
+        // 3. Check whether the vendor exists or not
+        guard let vendor = try await Vendor.find(vendorId, on: req.db) else {
+            throw Abort(.notFound, reason: "Vendor not found!")
+        }
+
+        // 4.Update the status of the Vendor Documents as accepted
+        try await Document.query(on: req.db)
+            .filter(\.$vendor.$id == vendorId)
+            .set(\.$status, to: .accepted)
+            .set(\.$verifiedOn, to: Date())
+            .update()
+
+        return "User has been successfully verified as a vendor."
     }
 }

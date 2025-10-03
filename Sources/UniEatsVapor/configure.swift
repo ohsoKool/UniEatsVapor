@@ -28,6 +28,8 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateCoupon())
     app.migrations.add(CreateMenuCategory())
     app.migrations.add(CreateMenuItem())
+    app.migrations.add(AddFullNameToUsers())
+    app.migrations.add(RemoveOldFullNameAndAddTimestamps())
 
     // **Run migrations automatically**
     try await app.autoMigrate()

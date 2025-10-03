@@ -8,7 +8,7 @@ struct CreateUser: AsyncMigration {
     func prepare(on database: any Database) async throws {
         try await database.schema("users")
             .id()
-            .field("fullName", .string, .required)
+            .field("full_name", .string, .required)
             .field("email", .string, .required)
             .unique(on: "email")
             .field("mobile", .string, .required)
@@ -26,4 +26,40 @@ struct CreateUser: AsyncMigration {
     }
 }
 
-// Everytime you add a new migration --> Run the command : swift run UniEatsVapor migration
+// Everytime you add a new migration --> Run the command : swift run UniEatsVapor migrate
+
+struct AddFullNameToUsers: AsyncMigration {
+    func prepare(on database: any Database) async throws {
+        try await database.schema("users")
+            .field("full_name", .string, .required, .sql(.default("default")))
+            .update()
+    }
+
+    func revert(on database: any Database) async throws {
+        try await database.schema("users")
+            .deleteField("full_name")
+            .update()
+    }
+}
+
+import Fluent
+
+struct RemoveOldFullNameAndAddTimestamps: AsyncMigration {
+    func prepare(on database: any Database) async throws {
+        try await database.schema("users")
+            .field("created_at", .datetime)
+            .field("updated_at", .datetime)
+            .field("deleted_at", .datetime)
+            .deleteField("fullName")
+            .update()
+    }
+
+    func revert(on database: any Database) async throws {
+        try await database.schema("users")
+            .field("fullName", .string)
+            .deleteField("created_at")
+            .deleteField("updated_at")
+            .deleteField("deleted_at")
+            .update()
+    }
+}

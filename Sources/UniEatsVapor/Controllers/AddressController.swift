@@ -30,12 +30,36 @@ extension AddressController {
         let dto = try req.content.decode(CreateAddressDTO.self)
 
         // 3. Map DTO to database model
-        let address = Address(userId: userId, street: dto.street, city: dto.city, state: dto.state, postalCode: dto.postalCode, isDefault: dto.isDefault)
+        let address = Address(
+            userId: userId,
+            name: dto.name,
+            phoneNumber: dto.phoneNumber,
+            instructions: dto.instructions,
+            addressType: dto.addressType,
+            street: dto.street,
+            city: dto.city,
+            state: dto.state,
+            postalCode: dto.postalCode,
+            isDefault: dto.isDefault
+        )
+
         // 4. Save to database
         try await address.save(on: req.db)
 
-        // 5.Return Response
-        return AddressResponseDTO(id: address.id!, userId: address.$user.id, street: address.street, city: address.city, state: address.state, postalCode: address.postalCode, isDefault: address.isDefault)
+        // 5. Return Response
+        return AddressResponseDTO(
+            id: address.id!,
+            userId: address.$user.id,
+            name: address.name,
+            phoneNumber: address.phoneNumber,
+            instructions: address.instructions,
+            addressType: address.addressType,
+            street: address.street,
+            city: address.city,
+            state: address.state,
+            postalCode: address.postalCode,
+            isDefault: address.isDefault
+        )
     }
 
     func deleteUserAddress(req: Request) async throws -> HTTPStatus {
@@ -47,7 +71,7 @@ extension AddressController {
         guard let address = try await Address.find(addressId, on: req.db) else {
             throw Abort(.notFound, reason: "Address Details not Found!")
         }
-        // 3.Delete the address record
+        // 3. Delete the address record
         try await address.delete(on: req.db)
 
         // 4. Return
@@ -75,6 +99,10 @@ extension AddressController {
             AddressResponseDTO(
                 id: address.id!,
                 userId: user.id!,
+                name: address.name,
+                phoneNumber: address.phoneNumber,
+                instructions: address.instructions,
+                addressType: address.addressType,
                 street: address.street,
                 city: address.city,
                 state: address.state,
@@ -85,18 +113,22 @@ extension AddressController {
     }
 
     func updateAddressDetails(req: Request) async throws -> AddressResponseDTO {
-        // 1.Get the addressId from the req parameters
+        // 1. Get the addressId from the req parameters
         guard let addressId = req.parameters.get("addressId", as: UUID.self) else {
             throw Abort(.badRequest, reason: "AddressId is required!")
         }
-        // 2.Check whether Address exists in the record
+        // 2. Check whether Address exists in the record
         guard let address = try await Address.find(addressId, on: req.db) else {
             throw Abort(.notFound, reason: "Address not Found!")
         }
-        // 3.Decode input into CreateAddressDTO
+        // 3. Decode input into CreateAddressDTO
         let dto = try req.content.decode(CreateAddressDTO.self)
 
-        // 4. If the req body is supported by the DTO --> update values
+        // 4. Update values from DTO
+        address.name = dto.name
+        address.phoneNumber = dto.phoneNumber
+        address.instructions = dto.instructions
+        address.addressType = dto.addressType
         address.street = dto.street
         address.city = dto.city
         address.state = dto.state
@@ -107,7 +139,19 @@ extension AddressController {
         try await address.save(on: req.db)
 
         // 6. Return the details of the address
-        return AddressResponseDTO(id: address.id!, userId: address.$user.id, street: address.street, city: address.city, state: address.state, postalCode: address.postalCode, isDefault: address.isDefault)
+        return AddressResponseDTO(
+            id: address.id!,
+            userId: address.$user.id,
+            name: address.name,
+            phoneNumber: address.phoneNumber,
+            instructions: address.instructions,
+            addressType: address.addressType,
+            street: address.street,
+            city: address.city,
+            state: address.state,
+            postalCode: address.postalCode,
+            isDefault: address.isDefault
+        )
     }
 
     func getOneAddress(req: Request) async throws -> AddressResponseDTO {
@@ -121,6 +165,18 @@ extension AddressController {
             throw Abort(.notFound, reason: "Address not found!")
         }
 
-        return AddressResponseDTO(id: address.id!, userId: address.$user.id, street: address.street, city: address.city, state: address.state, postalCode: address.postalCode, isDefault: address.isDefault)
+        return AddressResponseDTO(
+            id: address.id!,
+            userId: address.$user.id,
+            name: address.name,
+            phoneNumber: address.phoneNumber,
+            instructions: address.instructions,
+            addressType: address.addressType,
+            street: address.street,
+            city: address.city,
+            state: address.state,
+            postalCode: address.postalCode,
+            isDefault: address.isDefault
+        )
     }
 }

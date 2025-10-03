@@ -30,6 +30,9 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateMenuItem())
     app.migrations.add(AddFullNameToUsers())
     app.migrations.add(RemoveOldFullNameAndAddTimestamps())
+    app.migrations.add(UpdateAddressSchema())
+    app.migrations.add(UpdateUserIdField())
+    app.migrations.add(AddTimestampsToAddress())
 
     // **Run migrations automatically**
     try await app.autoMigrate()

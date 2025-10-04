@@ -42,8 +42,6 @@ struct AddFullNameToUsers: AsyncMigration {
     }
 }
 
-import Fluent
-
 struct RemoveOldFullNameAndAddTimestamps: AsyncMigration {
     func prepare(on database: any Database) async throws {
         try await database.schema("users")
@@ -61,5 +59,31 @@ struct RemoveOldFullNameAndAddTimestamps: AsyncMigration {
             .deleteField("updated_at")
             .deleteField("deleted_at")
             .update()
+    }
+}
+
+struct addStatusToUsers: AsyncMigration {
+    func prepare(on database: any Database) async throws {
+        // 1. Create enum for status
+        let status = try await database.enum("user_status")
+            .case("pending")
+            .case("verified")
+            .create()
+
+        try await database.schema("users")
+            .updateField("email", .string)
+            .field("status", status, .required, .sql(.default("pending")))
+            .update()
+    }
+
+    func revert(on database: any Database) async throws {
+        // Remove the field from the table
+        try await database.schema("users")
+            .deleteField("status")
+            .field("email", .string, .required)
+            .update()
+
+        // Then delete the enum type itself
+        try await database.enum("user_status").delete()
     }
 }

@@ -33,6 +33,8 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(UpdateAddressSchema())
     app.migrations.add(UpdateUserIdField())
     app.migrations.add(AddTimestampsToAddress())
+    app.migrations.add(CreateOtp())
+    app.migrations.add(addStatusToUsers())
 
     // **Run migrations automatically**
     try await app.autoMigrate()

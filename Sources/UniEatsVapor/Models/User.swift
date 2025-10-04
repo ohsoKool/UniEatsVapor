@@ -1,6 +1,11 @@
 import Fluent
 import Vapor
 
+enum UserStatus: String, Codable {
+    case pending
+    case verified
+}
+
 // Model tells Fluent that the class User conforms to a database table
 // Content lets Vapor convert this data to/from JSON automatically
 // @unchecked Sendable allows concurrency usage without explicit safety checks
@@ -13,14 +18,17 @@ final class User: Model, Content, @unchecked Sendable {
     var id: UUID?
 
     // 3. Fields
-    @Field(key: "full_name")
-    var fullName: String
+    @OptionalField(key: "full_name")
+    var fullName: String?
 
-    @Field(key: "email")
-    var email: String
+    @OptionalField(key: "email")
+    var email: String?
 
     @Field(key: "mobile")
-    var mobile: String
+    var mobile: String?
+
+    @Field(key: "status")
+    var status: UserStatus
 
     @OptionalField(key: "dob")
     var dob: Date?
@@ -48,12 +56,34 @@ final class User: Model, Content, @unchecked Sendable {
     init() {}
 
     // Init for app use
-    init(id: UUID? = nil, fullName: String, email: String, mobile: String, dob: Date? = nil, gender: String? = nil) {
+    init(
+        id: UUID? = nil,
+        fullName: String? = nil,
+        email: String? = nil,
+        mobile: String,
+        status: UserStatus = .pending,
+        dob: Date? = nil,
+        gender: String? = nil
+    ) {
         self.id = id
         self.fullName = fullName
         self.email = email
         self.mobile = mobile
+        self.status = status
         self.dob = dob
         self.gender = gender
+    }
+}
+
+// Purpose: Converts a User model instance into a simplified response object (ResponseDTO) that’s safe and consistent for API responses.
+extension User {
+    func asResponseDTO() throws -> ResponseDTO {
+        try .init(id: requireID(), mobile: mobile ?? "", status: status.rawValue)
+    }
+
+    struct ResponseDTO: Content {
+        let id: UUID
+        let mobile: String
+        let status: String
     }
 }

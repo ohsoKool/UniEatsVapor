@@ -8,18 +8,18 @@ public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
+    // Configure database connection using environment variables
+    // Falls back to defaults for local development
     app.databases.use(DatabaseConfigurationFactory.postgres(configuration: .init(
         hostname: Environment.get("DATABASE_HOST") ?? "localhost",
         port: Environment.get("DATABASE_PORT").flatMap(Int.init(_:)) ?? SQLPostgresConfiguration.ianaPortNumber,
         username: Environment.get("DATABASE_USERNAME") ?? "vapor_username",
         password: Environment.get("DATABASE_PASSWORD") ?? "vapor_password",
         database: Environment.get("DATABASE_NAME") ?? "vapor_database",
-        tls: .disable
-        // transport layer security which is an encryption layer for securing the connection between vapor app and postgres db
-        // disabled in development because we might encounter ssl is not trusted
-    )
-    ), as: .psql)
+        tls: .disable // disabled in development to avoid SSL certificate issues
+    )), as: .psql)
 
+    // Register database migrations
     app.migrations.add(CreateUser())
     app.migrations.add(CreateAddress())
     app.migrations.add(CreateVendor())
@@ -38,6 +38,14 @@ public func configure(_ app: Application) async throws {
 
     // **Run migrations automatically**
     try await app.autoMigrate()
+
+    // -----------------------------------------
+    // SERVER CONFIGURATION FOR RENDER DEPLOYMENT
+    // -----------------------------------------
+    // Render provides PORT environment variable; fallback to 8080 locally
+    let port = Environment.get("PORT").flatMap(Int.init) ?? 8080
+    app.http.server.configuration.port = port
+    app.http.server.configuration.hostname = "0.0.0.0"
 
     // register routes
     try routes(app)

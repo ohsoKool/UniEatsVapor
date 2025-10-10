@@ -20,4 +20,8 @@ func routes(_ app: Application) throws {
     try app.register(collection: UserController())
     try app.register(collection: AddressController())
     try app.register(collection: VendorController(storage: storage))
+
+    app.get("hello") { _ in
+        "👋 Hello from Vapor backend!"
+    }
 }

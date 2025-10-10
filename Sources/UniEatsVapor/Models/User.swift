@@ -27,7 +27,7 @@ final class User: Model, Content, @unchecked Sendable {
     @Field(key: "mobile")
     var mobile: String?
 
-    @Field(key: "status")
+    @Enum(key: "status")
     var status: UserStatus
 
     @OptionalField(key: "dob")

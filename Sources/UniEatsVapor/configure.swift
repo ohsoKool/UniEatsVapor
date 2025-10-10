@@ -35,6 +35,10 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(AddTimestampsToAddress())
     app.migrations.add(CreateOtp())
     app.migrations.add(addStatusToUsers())
+    app.migrations.add(AddUserStatusEnumAndField())
+    app.migrations.add(ReplaceEmailColumnInUsers())
+    app.migrations.add(MakeFullNameOptionalInUsers())
+    app.migrations.add(MakeEmailOptionalInUsers())
 
     // **Run migrations automatically**
     try await app.autoMigrate()

@@ -43,11 +43,12 @@ extension UserController {
             try await otp.save(on: req.db)
         }
 
-        // 5. Create an instance of TwilioService
-        let twilio = TwilioService(app: req.application)
-        let otpMessage = "Welcome to MeritMeals!. Get ready to indulge in the world of aromatic flavours. Your OTP is \(otpCode)"
-        // 6.Call sendSMS to send the message
-        try await twilio.sendSMS(to: dto.mobile, body: otpMessage)
+        req.logger.info("\(otpCode)")
+//        // 5. Create an instance of TwilioService
+//        let twilio = TwilioService(app: req.application)
+//        let otpMessage = "Welcome to MeritMeals!. Get ready to indulge in the world of aromatic flavours. Your OTP is \(otpCode)"
+//        // 6.Call sendSMS to send the message
+//        try await twilio.sendSMS(to: dto.mobile, body: otpMessage)
         return .ok
     }
 
